@@ -53,25 +53,25 @@ app.get('/api/leads', async (req, res) => {
     } catch (e) { res.status(500).send(e.message); }
 });
 
-// ROTA DO HUNTER (IA) - AQUI ONDE A MÁGICA ACONTECE
+// ROTA DO HUNTER (IA)
 app.post('/api/hunter/gerar', async (req, res) => {
     try {
         console.log("🤖 Hunter pensando...");
         const clienteId = req.body.clienteId || "CLIENTE_MASTER_BRUNO";
 
-        // Busca a memória (RAG) para personalização
+        // Busca a memória (RAG)
         const memoriaRef = await db.collection('clientes_whitelabel').doc(clienteId).collection('memoria_hunter').get();
         let contexto = "";
         memoriaRef.forEach(doc => contexto += doc.data().texto + " ");
         
         if (!contexto) contexto = "Brasilguard Sistemas: Tecnologia em segurança e automação.";
 
-        // Usando o modelo FLASH para máxima velocidade e compatibilidade
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // SOLUÇÃO DO ERRO 404: Usando o modelo universal
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         
         const prompt = `Aja como um vendedor experiente. 
         Contexto do meu negócio: ${contexto}.
-        Tarefa: Crie uma mensagem curta de 2 frases para o WhatsApp para abordar um lead do Google Maps. Seja direto e amigável.`;
+        Tarefa: Crie uma mensagem curta de 2 frases para o WhatsApp para abordar um lead do Google Maps. Seja direto e amigável. Não use placeholders como [Nome].`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
