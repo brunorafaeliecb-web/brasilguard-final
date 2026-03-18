@@ -1,7 +1,6 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 app.use(cors()); 
@@ -17,15 +16,14 @@ try {
 }
 const db = admin.firestore();
 
-// 2. Conexão Inteligência Artificial
+// 2. Chave da IA
 const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey || "");
 
 // --- ROTAS DO SISTEMA ---
 
 app.get('/', (req, res) => res.send("Brasilguard Core Online!"));
 
-// Rota para receber Leads do Radar
+// Rota do Radar
 app.post('/webhook/leads', async (req, res) => {
     try {
         const { contatos, origem, clienteId = "CLIENTE_MASTER_BRUNO" } = req.body;
@@ -42,7 +40,7 @@ app.post('/webhook/leads', async (req, res) => {
     } catch (e) { res.status(500).send(e.message); }
 });
 
-// Rota para o Painel ler os Leads
+// Rota do Painel
 app.get('/api/leads', async (req, res) => {
     try {
         const clienteId = req.query.clienteId || "CLIENTE_MASTER_BRUNO";
@@ -53,11 +51,15 @@ app.get('/api/leads', async (req, res) => {
     } catch (e) { res.status(500).send(e.message); }
 });
 
-// ROTA DO HUNTER (IA)
+// ROTA DO HUNTER (IA) - VIA CONEXÃO DIRETA E NATIVA
 app.post('/api/hunter/gerar', async (req, res) => {
     try {
-        console.log("🤖 Hunter pensando...");
+        console.log("🤖 Hunter pensando via Bypass Nativo...");
         const clienteId = req.body.clienteId || "CLIENTE_MASTER_BRUNO";
+
+        if (!apiKey) {
+            return res.status(500).json({ sucesso: false, erro: "Chave API ausente no servidor." });
+        }
 
         // Busca a memória (RAG)
         const memoriaRef = await db.collection('clientes_whitelabel').doc(clienteId).collection('memoria_hunter').get();
@@ -65,21 +67,34 @@ app.post('/api/hunter/gerar', async (req, res) => {
         memoriaRef.forEach(doc => contexto += doc.data().texto + " ");
         
         if (!contexto) contexto = "Brasilguard Sistemas: Tecnologia em segurança e automação.";
-
-        // SOLUÇÃO DO ERRO 404: Usando o modelo universal
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         
-        const prompt = `Aja como um vendedor experiente. 
-        Contexto do meu negócio: ${contexto}.
-        Tarefa: Crie uma mensagem curta de 2 frases para o WhatsApp para abordar um lead do Google Maps. Seja direto e amigável. Não use placeholders como [Nome].`;
+        const promptText = `Aja como um vendedor experiente. Contexto: ${contexto}. Tarefa: Crie uma mensagem curta de 2 frases para WhatsApp para abordar um lead. Seja amigável e direto.`;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        // 🚀 O BYPASS: Conexão direta com a URL do Google (Modelo 1.5 Flash super rápido)
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }]
+            })
+        });
 
+        const data = await response.json();
+
+        // Se o Google reclamar de algo, vamos cuspir o erro real na tela
+        if (!response.ok) {
+            console.error("Erro Direto da API do Google:", data);
+            throw new Error(data.error?.message || "Erro desconhecido na API do Google");
+        }
+
+        // Extrai o texto da resposta bruta
+        const text = data.candidates[0].content.parts[0].text;
         res.json({ sucesso: true, mensagem: text });
+
     } catch (error) {
-        console.error("Erro Hunter:", error);
+        console.error("❌ Erro Hunter:", error.message);
         res.status(500).json({ sucesso: false, erro: error.message });
     }
 });
