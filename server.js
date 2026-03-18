@@ -52,4 +52,24 @@ app.post('/webhook/leads', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+// Rota para o Painel de Controle ler os leads do Cofre
+app.get('/api/leads', async (req, res) => {
+    try {
+        // Vai no banco de dados e pega todos os leads
+        const snapshot = await db.collection('leads_capturados').get();
+        const listaDeLeads = [];
+        
+        snapshot.forEach(doc => {
+            listaDeLeads.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        res.status(200).json(listaDeLeads);
+    } catch (error) {
+        console.error("Erro ao buscar leads:", error);
+        res.status(500).send({ erro: "Falha ao buscar no banco de dados" });
+    }
+});
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
