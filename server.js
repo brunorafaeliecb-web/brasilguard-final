@@ -7,92 +7,82 @@ const app = express();
 app.use(cors()); 
 app.use(express.json());
 
-// 1. Firebase (Cofre)
+// 1. Conexão Firebase
 try {
     const serviceAccount = require('./firebase-key.json');
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
     console.log("✅ Cofre Firebase Conectado!");
 } catch (e) {
-    console.log("⚠️ Aguardando chave do Firebase no Render...");
+    console.log("⚠️ Aguardando chave do Firebase...");
 }
 const db = admin.firestore();
 
-// 2. Inteligência Artificial (Gemini Pro)
+// 2. Conexão Inteligência Artificial
 const apiKey = process.env.GEMINI_API_KEY;
-if (apiKey) {
-    console.log("✅ Chave GEMINI_API_KEY detectada!");
-} else {
-    console.log("❌ ERRO: Chave GEMINI_API_KEY ausente no Render!");
-}
-
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
-// --- ROTAS ---
+// --- ROTAS DO SISTEMA ---
 
 app.get('/', (req, res) => res.send("Brasilguard Core Online!"));
 
-// Rota do Radar (Captura de Leads)
+// Rota para receber Leads do Radar
 app.post('/webhook/leads', async (req, res) => {
     try {
         const { contatos, origem, clienteId = "CLIENTE_MASTER_BRUNO" } = req.body;
         const cofre = db.collection('clientes_whitelabel').doc(clienteId).collection('leads_capturados');
         for (let tel of (contatos || [])) {
-            await cofre.add({ 
-                telefone: tel, 
-                origem: origem || "Google Maps", 
-                status: "Novo", 
-                data_captura: admin.firestore.FieldValue.serverTimestamp() 
+            await cofre.add({
+                telefone: tel,
+                origem: origem || "Google Maps",
+                status: "Novo",
+                data_captura: admin.firestore.FieldValue.serverTimestamp()
             });
         }
         res.status(200).send({ sucesso: true });
-    } catch (e) { 
-        console.error("Erro no Webhook:", e.message);
-        res.status(500).send(e.message); 
-    }
+    } catch (e) { res.status(500).send(e.message); }
 });
 
-// Rota do Painel (Listagem)
+// Rota para o Painel ler os Leads
 app.get('/api/leads', async (req, res) => {
     try {
         const clienteId = req.query.clienteId || "CLIENTE_MASTER_BRUNO";
-        const snap = await db.collection('clientes_whitelabel').doc(clienteId).collection('leads_capturados').get();
+        const snapshot = await db.collection('clientes_whitelabel').doc(clienteId).collection('leads_capturados').get();
         const lista = [];
-        snap.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
+        snapshot.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
         res.json(lista);
     } catch (e) { res.status(500).send(e.message); }
 });
 
-// ROTA DO HUNTER (IA RAG)
+// ROTA DO HUNTER (IA) - AQUI ONDE A MÁGICA ACONTECE
 app.post('/api/hunter/gerar', async (req, res) => {
     try {
-        console.log("🤖 Hunter acionado...");
+        console.log("🤖 Hunter pensando...");
         const clienteId = req.body.clienteId || "CLIENTE_MASTER_BRUNO";
 
-        // Busca Memória do Cliente (RAG)
+        // Busca a memória (RAG) para personalização
         const memoriaRef = await db.collection('clientes_whitelabel').doc(clienteId).collection('memoria_hunter').get();
         let contexto = "";
         memoriaRef.forEach(doc => contexto += doc.data().texto + " ");
         
-        if (!contexto) contexto = "Brasilguard Sistemas: Soluções em tecnologia e automação.";
+        if (!contexto) contexto = "Brasilguard Sistemas: Tecnologia em segurança e automação.";
 
-        // Chamada do Modelo Pro (Ajustado para evitar erro 404)
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        // Usando o modelo FLASH para máxima velocidade e compatibilidade
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         
-        const prompt = `Aja como um vendedor humano e natural. 
+        const prompt = `Aja como um vendedor experiente. 
         Contexto do meu negócio: ${contexto}.
-        Tarefa: Escreva uma saudação inicial de 2 frases para WhatsApp para um lead do Google Maps.`;
+        Tarefa: Crie uma mensagem curta de 2 frases para o WhatsApp para abordar um lead do Google Maps. Seja direto e amigável.`;
 
         const result = await model.generateContent(prompt);
-        const text = result.response.text();
+        const response = await result.response;
+        const text = response.text();
 
-        console.log("✨ Mensagem gerada!");
         res.json({ sucesso: true, mensagem: text });
-
     } catch (error) {
-        console.error("❌ ERRO NO HUNTER:", error.message);
+        console.error("Erro Hunter:", error);
         res.status(500).json({ sucesso: false, erro: error.message });
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor Brasilguard na porta ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Nave-Mãe na porta ${PORT}`));
