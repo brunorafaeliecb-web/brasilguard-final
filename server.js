@@ -84,7 +84,7 @@ app.post('/api/hunter/gerar', async (req, res) => {
         Tarefa: Crie uma mensagem curta, persuasiva e muito natural (máximo 3 frases) para iniciar uma conversa com um lead capturado no Google Maps. Aja como um humano, não pareça um robô.`;
 
         // Passo 3: Geração da Mensagem
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const result = await model.generateContent(prompt);
         const mensagemPronta = result.response.text();
 
