@@ -54,7 +54,7 @@ app.get('/api/leads', async (req, res) => {
 // ROTA DO HUNTER (IA) - VIA CONEXÃO DIRETA E NATIVA
 app.post('/api/hunter/gerar', async (req, res) => {
     try {
-        console.log("🤖 Hunter pensando via Bypass Nativo...");
+        console.log("🤖 Hunter pensando via Bypass Nativo (gemini-pro)...");
         const clienteId = req.body.clienteId || "CLIENTE_MASTER_BRUNO";
 
         if (!apiKey) {
@@ -70,8 +70,8 @@ app.post('/api/hunter/gerar', async (req, res) => {
         
         const promptText = `Aja como um vendedor experiente. Contexto: ${contexto}. Tarefa: Crie uma mensagem curta de 2 frases para WhatsApp para abordar um lead. Seja amigável e direto.`;
 
-        // 🚀 O BYPASS: Conexão direta com a URL do Google (Modelo 1.5 Flash super rápido)
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // 🚀 O BYPASS: Usando o gemini-pro (versão clássica 100% garantida)
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
             method: 'POST',
@@ -83,13 +83,11 @@ app.post('/api/hunter/gerar', async (req, res) => {
 
         const data = await response.json();
 
-        // Se o Google reclamar de algo, vamos cuspir o erro real na tela
         if (!response.ok) {
             console.error("Erro Direto da API do Google:", data);
             throw new Error(data.error?.message || "Erro desconhecido na API do Google");
         }
 
-        // Extrai o texto da resposta bruta
         const text = data.candidates[0].content.parts[0].text;
         res.json({ sucesso: true, mensagem: text });
 
