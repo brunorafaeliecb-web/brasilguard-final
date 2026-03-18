@@ -54,7 +54,7 @@ app.get('/api/leads', async (req, res) => {
 // ROTA DO HUNTER (IA) - VIA CONEXÃO DIRETA E NATIVA
 app.post('/api/hunter/gerar', async (req, res) => {
     try {
-        console.log("🤖 Hunter pensando via Bypass Nativo (gemini-pro)...");
+        console.log("🤖 Hunter pensando via Bypass Nativo (gemini-2.5-flash)...");
         const clienteId = req.body.clienteId || "CLIENTE_MASTER_BRUNO";
 
         if (!apiKey) {
@@ -70,8 +70,8 @@ app.post('/api/hunter/gerar', async (req, res) => {
         
         const promptText = `Aja como um vendedor experiente. Contexto: ${contexto}. Tarefa: Crie uma mensagem curta de 2 frases para WhatsApp para abordar um lead. Seja amigável e direto.`;
 
-        // 🚀 O BYPASS: Usando o gemini-pro (versão clássica 100% garantida)
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        // 🚀 O BYPASS ATUALIZADO: Usando o gemini-2.5-flash exato da sua lista
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
             method: 'POST',
