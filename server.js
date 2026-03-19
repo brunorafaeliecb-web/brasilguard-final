@@ -39,10 +39,13 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
         res.json({ sucesso: true, relatorio: respostaIA });
 
     } catch (error) {
-        console.error("Erro na IA:", error);
-        res.status(500).json({ sucesso: false, erro: "A IA não conseguiu responder. Verifique a chave API no Render." });
+        // Isso aqui vai mostrar o erro REAL no log do Render
+        console.error("ERRO DETALHADO DA IA:", error.message);
+        res.status(500).json({ 
+            sucesso: false, 
+            erro: error.message // Mandando o erro real pro painel
+        });
     }
-});
 
 // Outras rotas do Hunter...
 app.post('/api/hunter/treinar', (req, res) => res.json({ sucesso: true }));
