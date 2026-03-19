@@ -51,42 +51,58 @@ app.get('/api/leads', async (req, res) => {
     } catch (e) { res.status(500).send(e.message); }
 });
 
-// ROTA DO HUNTER (IA) - VIA CONEXÃO DIRETA E NATIVA
+// --- NOVAS ROTAS DE PERSONALIZAÇÃO (A SUA CARA) ---
+
+// Salvar o Treinamento da IA
+app.post('/api/hunter/treinar', async (req, res) => {
+    try {
+        const { instrucoes, clienteId = "CLIENTE_MASTER_BRUNO" } = req.body;
+        await db.collection('clientes_whitelabel').doc(clienteId)
+                .collection('memoria_hunter').doc('personalidade')
+                .set({ texto: instrucoes });
+        res.json({ sucesso: true });
+    } catch (error) {
+        res.status(500).json({ sucesso: false, erro: error.message });
+    }
+});
+
+// Ler o Treinamento Atual
+app.get('/api/hunter/memoria', async (req, res) => {
+    try {
+        const clienteId = req.query.clienteId || "CLIENTE_MASTER_BRUNO";
+        const doc = await db.collection('clientes_whitelabel').doc(clienteId)
+                      .collection('memoria_hunter').doc('personalidade').get();
+        res.json({ texto: doc.exists ? doc.data().texto : "" });
+    } catch (e) { res.status(500).send(e.message); }
+});
+
+// ROTA DO HUNTER (IA) - AGORA 100% PERSONALIZÁVEL
 app.post('/api/hunter/gerar', async (req, res) => {
     try {
-        console.log("🤖 Hunter pensando via Bypass Nativo (gemini-2.5-flash)...");
         const clienteId = req.body.clienteId || "CLIENTE_MASTER_BRUNO";
+        if (!apiKey) return res.status(500).json({ sucesso: false, erro: "Chave API ausente." });
 
-        if (!apiKey) {
-            return res.status(500).json({ sucesso: false, erro: "Chave API ausente no servidor." });
-        }
-
-        // Busca a memória (RAG)
-        const memoriaRef = await db.collection('clientes_whitelabel').doc(clienteId).collection('memoria_hunter').get();
-        let contexto = "";
-        memoriaRef.forEach(doc => contexto += doc.data().texto + " ");
+        // Puxa exatamente o texto que você digitou no painel
+        const doc = await db.collection('clientes_whitelabel').doc(clienteId)
+                      .collection('memoria_hunter').doc('personalidade').get();
         
-        if (!contexto) contexto = "Brasilguard Sistemas: Tecnologia em segurança e automação.";
+        let instrucoesDoCliente = doc.exists ? doc.data().texto : "Aja como um atendente educado. Crie uma saudação de 2 frases.";
         
-        const promptText = `Aja como um vendedor experiente. Contexto: ${contexto}. Tarefa: Crie uma mensagem curta de 2 frases para WhatsApp para abordar um lead. Seja amigável e direto.`;
+        // A regra agora é definida por você!
+        const promptText = `Você é uma IA de vendas. 
+        INSTRUÇÕES DE PERSONALIDADE E TAREFA: ${instrucoesDoCliente}. 
+        Aja apenas como instruído acima e devolva apenas o texto da mensagem pronta para o WhatsApp.`;
 
-        // 🚀 O BYPASS ATUALIZADO: Usando o gemini-2.5-flash exato da sua lista
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
-            })
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
         });
 
         const data = await response.json();
-
-        if (!response.ok) {
-            console.error("Erro Direto da API do Google:", data);
-            throw new Error(data.error?.message || "Erro desconhecido na API do Google");
-        }
+        if (!response.ok) throw new Error(data.error?.message || "Erro no Google");
 
         const text = data.candidates[0].content.parts[0].text;
         res.json({ sucesso: true, mensagem: text });
