@@ -283,7 +283,13 @@
             const prob = document.getElementById('os-problema').value;
             const serv = document.getElementById('os-servico').value;
             
-            if(!prob || !serv) return alert("Preencha o problema e o serviço executado para a IA gerar o relatório!");
+            if(dados.sucesso) {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
+                    window.fecharModal();
+                } else {
+                    // Isso vai mostrar o erro REAL que vem do Render
+                    alert("A IA disse: " + dados.erro);
+                }
 
             const btn = event.target;
             const textoOriginal = btn.innerText;
