@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Brasilguard 2026</title>
+    <style>
+        :root {
+            --base-bg: #09121f; 
+            --teal-gradient: linear-gradient(135deg, #1abc9c 0%, #2980b9 100%);
+            --glass: rgba(255, 255, 255, 0.03); 
+            --text-main: #f4f7f6;
+            --text-sub: #b0bec5;
+        }
+
+        body {
+            font-family: 'Avenir', 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background-color: var(--base-bg);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(16, 163, 127, 0.2) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 118, 163, 0.2) 0px, transparent 50%);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .login-box {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .login-box h1 {
+            font-size: 2.2rem;
+            margin-top: 0;
+            margin-bottom: 5px;
+            background: var(--teal-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-box p {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(26, 188, 156, 0.2);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1abc9c;
+            box-shadow: 0 0 10px rgba(26, 188, 156, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-principal {
+            background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+        }
+
+        .btn-principal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 188, 156, 0.2);
+        }
+
+        .divisor {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-sub);
+            margin: 20px 0;
+            font-size: 0.85rem;
+        }
+        
+        .divisor::before, .divisor::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .divisor:not(:empty)::before { margin-right: .25em; }
+        .divisor:not(:empty)::after { margin-left: .25em; }
+
+        .btn-google {
+            background: #ffffff;
+            color: #333;
+        }
+
+        .btn-google:hover {
+            background: #f1f1f1;
+            transform: translateY(-2px);
+        }
+
+        /* Ícone do Google feito via CSS SVG básico */
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toggle-mode {
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .toggle-mode:hover { color: #1abc9c; }
+
+        #mensagem-erro {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h1 id="titulo-form">Acesso Restrito</h1>
+        <p id="subtitulo-form">Insira suas credenciais da Brasilguard</p>
+
+        <input type="email" id="email" placeholder="Seu E-mail" required>
+        <input type="password" id="senha" placeholder="Sua Senha" required>
+
+        <button id="btn-acao" class="btn-principal" onclick="executarAcao()">Entrar no Sistema</button>
+
+        <div class="divisor">OU</div>
+
+        <button class="btn-google" onclick="loginComGoogle()">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continuar com o Google
+        </button>
+        
+        <div class="toggle-mode" onclick="alternarModo()" id="texto-alternar">
+            Não tem uma conta? <strong>Cadastre-se aqui.</strong>
+        </div>
+
+        <div id="mensagem-erro"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        // Importando as ferramentas do Google Auth
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABi8se1JZzGNZtsYds6ARxkEAzuAQnbTo",
+            authDomain: "brasilguard-cofre.firebaseapp.com",
+            projectId: "brasilguard-cofre",
+            storageBucket: "brasilguard-cofre.firebasestorage.app",
+            messagingSenderId: "948181992816",
+            appId: "1:948181992816:web:dc02c06f6d17a078cefbb5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider(); // Ligando o provedor do Google
+
+        let modoCadastro = false;
+
+        window.alternarModo = function() {
+            modoCadastro = !modoCadastro;
+            document.getElementById('titulo-form').innerText = modoCadastro ? "Nova Assinatura" : "Acesso Restrito";
+            document.getElementById('subtitulo-form').innerText = modoCadastro ? "Crie sua conta na Brasilguard" : "Insira suas credenciais da Brasilguard";
+            document.getElementById('btn-acao').innerText = modoCadastro ? "Criar Conta" : "Entrar no Sistema";
+            document.getElementById('texto-alternar').innerHTML = modoCadastro ? "Já tem uma conta? <strong>Faça login.</strong>" : "Não tem uma conta? <strong>Cadastre-se aqui.</strong>";
+        }
+
+        // Função de Login/Cadastro com E-mail
+        window.executarAcao = async function() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const erroDiv = document.getElementById('mensagem-erro');
+            erroDiv.style.display = 'none';
+
+            if(!email || !senha) {
+                erroDiv.innerText = "Preencha e-mail e senha!";
+                erroDiv.style.display = 'block';
+                return;
+            }
+
+            document.getElementById('btn-acao').innerText = "Processando...";
+
+            try {
+                if (modoCadastro) {
+                    await createUserWithEmailAndPassword(auth, email, senha);
+                    window.location.href = "index.html"; 
+                } else {
+                    await signInWithEmailAndPassword(auth, email, senha);
+                    window.location.href = "index.html"; 
+                }
+            } catch (error) {
+                erroDiv.innerText = "Erro: " + error.message;
+                erroDiv.style.display = 'block';
+                document.getElementById('btn-acao').innerText = modoCadastro ? "Criar Conta" : "Entrar no Sistema";
+            }
+        }
+
+        // Função Nova: Login com Google
+        window.loginComGoogle = async function() {
+            const erroDiv = document.getElementById('mensagem-erro');
+            erroDiv.style.display = 'none';
+
+            try {
+                // Abre o popup do Google para a conta logada no navegador
+                await signInWithPopup(auth, googleProvider);
+                window.location.href = "index.html"; // Redireciona se der tudo certo
+            } catch (error) {
+                erroDiv.innerText = "Erro no Google: " + error.message;
+                erroDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
