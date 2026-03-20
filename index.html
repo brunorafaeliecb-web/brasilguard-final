@@ -8,39 +8,51 @@
         :root {
             --base-bg: #09121f; --teal-gradient: linear-gradient(135deg, #1abc9c 0%, #2980b9 100%); 
             --emerald-low: #10a37f; --cyan-low: #0076a3; --glass: rgba(255, 255, 255, 0.03); 
-            --text-main: #f4f7f6; --text-sub: #b0bec5;
+            --text-main: #f4f7f6; --text-sub: #b0bec5; --accent: #f39c12;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--base-bg); color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; }
-        .l-container { max-width: 1200px; margin: 0 auto; }
-        .box-padrao { background: var(--glass); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-        .nav-abas { display: flex; gap: 15px; margin-bottom: 30px; }
-        .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-aba.ativa { background: var(--teal-gradient); color: white; border: none; }
+
+        body { font-family: 'Avenir', 'Segoe UI', sans-serif; background-color: var(--base-bg); background-image: radial-gradient(at 10% 20%, rgba(16, 163, 127, 0.2) 0px, transparent 50%), radial-gradient(at 90% 80%, rgba(0, 118, 163, 0.2) 0px, transparent 50%); margin: 0; padding: 20px 40px; color: var(--text-main); min-height: 100vh; }
+        .l-container { max-width: 1200px; margin: 0 auto; position: relative; }
+
+        /* HEADER E NAVEGAÇÃO */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .header-top h1 { font-size: 2rem; margin: 0; background: var(--teal-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+        .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-aba.ativa { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; border-color: transparent; }
+
+        /* PAINEIS */
         .aba-conteudo { display: none; }
         .aba-conteudo.ativa { display: block; }
+        .box-padrao { background: var(--glass); backdrop-filter: blur(10px); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; }
+        
+        input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(26, 188, 156, 0.2); border-radius: 8px; color: white; margin-bottom: 15px; }
+        .btn-acao { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        /* MODAL */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: var(--base-bg); margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; border: 1px solid #1abc9c; }
-        .btn-acao { background: var(--teal-gradient); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; }
-        td, th { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .modal-content { background: var(--base-bg); border: 1px solid #1abc9c; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; color: white; }
     </style>
 </head>
 <body>
 
     <div id="modal-os" class="modal">
         <div class="modal-content">
-            <h3 style="color:#1abc9c">📋 Ordem de Serviço</h3>
-            <p id="modal-cliente"></p>
+            <h3 style="color:#1abc9c">📋 Nova Ordem de Serviço</h3>
+            <p id="modal-cliente" style="color:var(--text-sub);"></p>
             <input type="text" id="os-problema" placeholder="Problema Relatado">
-            <textarea id="os-servico" placeholder="Solução Técnica" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
-            <button class="btn-acao" onclick="salvarOS()">💾 Salvar</button>
-            <button class="btn-acao" style="background: #8e44ad; margin-top:10px;" onclick="gerarRelatorioIA(event)">✨ Gerar Relatório IA</button>
-            <button class="btn-acao" style="background: #555; margin-top:10px;" onclick="fecharModal()">Fechar</button>
+            <textarea id="os-servico" placeholder="Serviço Executado" style="height: 100px;"></textarea>
+            <button class="btn-acao" style="width:100%; margin-bottom: 10px;" onclick="salvarOS()">💾 Salvar Registro</button>
+            <button class="btn-acao" id="btn-gerar-ia" style="width:100%; background: #8e44ad;" onclick="gerarRelatorioIA(event)">✨ Criar Relatório IA</button>
+            <button class="btn-acao" style="width:100%; background: #555; margin-top:10px;" onclick="fecharModal()">Fechar</button>
         </div>
     </div>
 
     <div id="tela-sistema" class="l-container">
-        <h1>BRASILGUARD SISTEMAS</h1>
+        <div class="header-top">
+            <h1>BRASILGUARD SISTEMAS</h1>
+            <button class="btn-acao" style="background:rgba(255,107,107,0.2); color:#ff6b6b;" onclick="deslogarSistema()">🚪 Sair</button>
+        </div>
+
         <div class="nav-abas">
             <button class="btn-aba ativa" onclick="mudarAba('hunter', this)">🎯 Radar & Hunter</button>
             <button class="btn-aba" onclick="mudarAba('servicedesk', this)">🛠️ Service Desk</button>
@@ -49,25 +61,55 @@
         <div id="aba-hunter" class="aba-conteudo ativa">
             <div class="box-padrao">
                 <h3>📋 Leads (Cofre)</h3>
-                <table id="tabela-leads"></table>
+                <table id="tabela-leads" style="width: 100%; color: white;"></table>
             </div>
         </div>
 
         <div id="aba-servicedesk" class="aba-conteudo">
             <div class="box-padrao">
                 <h3>🏢 Clientes Ativos</h3>
-                <table>
-                    <tr><td>Condomínio Exemplo</td><td><button onclick="abrirModalOS('Condomínio Exemplo')">+ O.S.</button></td></tr>
+                <table style="width: 100%; color: white;">
+                    <tr>
+                        <td>Condomínio Exemplo</td>
+                        <td><button class="btn-acao" style="padding: 5px 15px;" onclick="abrirModalOS('Condomínio Exemplo')">+ O.S.</button></td>
+                    </tr>
                 </table>
             </div>
         </div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABi8se1JZzGNZtsYds6ARxkEAzuAQnbTo",
+            authDomain: "brasilguard-cofre.firebaseapp.com",
+            projectId: "brasilguard-cofre",
+            storageBucket: "brasilguard-cofre.firebasestorage.app",
+            messagingSenderId: "948181992816",
+            appId: "1:948181992816:web:dc02c06f6d17a078cefbb5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        window.deslogarSistema = () => signOut(auth).then(() => window.location.replace("login.html"));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.usuarioLogadoId = user.uid;
+                document.getElementById('tela-sistema').style.display = "block";
+            } else {
+                window.location.replace("login.html");
+            }
+        });
+    </script>
+
     <script>
         const BASE_URL = 'https://brasilguard-final.onrender.com';
         window.clienteAtualOS = "";
 
-        // FUNÇÃO DE MUDAR ABAS (DEFINIDA NO TOPO)
         function mudarAba(abaId, btn) {
             document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.btn-aba').forEach(b => b.classList.remove('ativa'));
@@ -83,39 +125,47 @@
 
         function fecharModal() { document.getElementById('modal-os').style.display = "none"; }
 
+        // --- CORREÇÃO DA IA (DADOS DEFINIDOS NO LOCAL CERTO) ---
         async function gerarRelatorioIA(event) {
             if(event) event.preventDefault();
             const prob = document.getElementById('os-problema').value;
             const serv = document.getElementById('os-servico').value;
-            const btn = event.target;
+            const btn = document.getElementById('btn-gerar-ia');
             
-            btn.innerText = "⏳ PROCESSANDO...";
+            if(!prob || !serv) return alert("Preencha o problema e a solução!");
+
+            btn.innerText = "⏳ IA ESCREVENDO...";
             btn.disabled = true;
 
             try {
                 const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cliente: window.clienteAtualOS, problema: prob, servico: serv })
+                    body: JSON.stringify({ 
+                        cliente: window.clienteAtualOS, 
+                        problema: prob, 
+                        servico: serv 
+                    })
                 });
 
-                const dados = await res.json(); // AGORA 'DADOS' ESTÁ DEFINIDO AQUI
+                // AQUI CRIAMOS A VARIÁVEL DADOS SOMENTE APÓS A RESPOSTA
+                const dados = await res.json(); 
 
                 if(dados.sucesso) {
                     window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
                     fecharModal();
                 } else {
-                    alert("Erro: " + dados.erro);
+                    alert("Erro na IA: " + (dados.erro || "Verifique o Render"));
                 }
             } catch (e) {
-                alert("Erro de conexão com o Render.");
+                alert("Erro ao conectar com a Nave-Mãe.");
             } finally {
-                btn.innerText = "✨ Gerar Relatório IA";
+                btn.innerText = "✨ Criar Relatório IA";
                 btn.disabled = false;
             }
         }
 
-        function salvarOS() { alert("Salvo!"); fecharModal(); }
+        function salvarOS() { alert("Salvo no Banco!"); fecharModal(); }
     </script>
 </body>
 </html>
