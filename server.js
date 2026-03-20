@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => res.send('🚀 Nave-Mãe Brasilguard Online | Gemini 3 Flash Ativo'));
+app.get('/', (req, res) => res.send('🚀 Nave-Mãe Brasilguard Online | Gemini 1.5 Flash Ativo'));
 
 app.post('/api/hunter/gerar-os', async (req, res) => {
     try {
@@ -16,8 +16,8 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         
-        // MOTOR DE 2026: gemini-3-flash (Estável e Ultrarrápido)
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
+        // CORREÇÃO AQUI: Usando o modelo real 'gemini-1.5-flash'
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `Aja como técnico sênior da Brasilguard Sistemas. Crie um relatório para o WhatsApp do cliente "${cliente}". 
         Problema: ${problema}. 
@@ -30,9 +30,9 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
         res.json({ sucesso: true, relatorio: response.text() });
     } catch (error) {
         console.error("ERRO NO RENDER:", error.message);
-        res.status(500).json({ sucesso: false, erro: "O motor Gemini 3 Flash teve um soluço." });
+        res.status(500).json({ sucesso: false, erro: "O motor Gemini teve um soluço." });
     }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => console.log(`✅ Brasilguard Core rodando com Gemini 3 Flash`));
+app.listen(PORT, '0.0.0.0', () => console.log(`✅ Brasilguard Core rodando com Gemini 1.5 Flash`));
