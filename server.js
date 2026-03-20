@@ -4,45 +4,58 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
 const app = express();
+
+// Configurações de Segurança e Dados
 app.use(cors());
 app.use(express.json());
 
 // Rota de Teste (Health Check)
-app.get('/', (req, res) => res.send('🚀 Nave-Mãe Brasilguard Online | Gemini 2.5 Pro Ativo'));
+app.get('/', (req, res) => {
+    res.send('🚀 Nave-Mãe Brasilguard Online | Gemini 3 Pro Ativo');
+});
 
-// Rota do Hunter (Gerador de O.S.)
+// Rota do Hunter: Gerador de O.S. com IA
 app.post('/api/hunter/gerar-os', async (req, res) => {
     try {
         const { cliente, problema, servico } = req.body;
         
         if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ sucesso: false, erro: "Chave API não configurada no Render." });
+            console.error("ERRO: Chave API ausente no Render!");
+            return res.status(500).json({ sucesso: false, erro: "Configuração de API pendente." });
         }
 
+        // Inicializa a IA com o motor de 2026
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         
-        // MODELO ATUALIZADO 2026: gemini-2.5-pro
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+        // MODELO TOP DE LINHA PARA CONTAS PRO: gemini-3-pro
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-3-pro",
+            generationConfig: { temperature: 0.7 } 
+        });
 
-        const prompt = `Aja como um técnico sênior da Brasilguard Sistemas. 
-        Crie um relatório profissional para o WhatsApp do cliente "${cliente}". 
-        Problema: ${problema}. 
+        const prompt = `Aja como o técnico principal da Brasilguard Sistemas. 
+        Crie uma mensagem profissional para o WhatsApp do cliente "${cliente}". 
+        Relato do Problema: ${problema}. 
         Serviço Realizado: ${servico}. 
-        Confirme que o sistema está 100% testado e funcional. Seja direto e técnico.`;
+        Garanta ao cliente que o sistema foi testado e está 100% operacional. 
+        Use um tom técnico, mas acessível. Sem introduções, vá direto ao texto da mensagem.`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        
-        res.json({ sucesso: true, relatorio: response.text() });
+        const textoIA = response.text();
+
+        console.log(`✅ O.S. gerada com sucesso para: ${cliente}`);
+        res.json({ sucesso: true, relatorio: textoIA });
 
     } catch (error) {
-        console.error("ERRO NO RENDER:", error.message);
-        res.status(500).json({ sucesso: false, erro: error.message });
+        console.error("❌ ERRO NO MOTOR IA:", error.message);
+        res.status(500).json({ sucesso: false, erro: "O motor da IA teve um soluço. Verifique os logs." });
     }
 });
 
+// Porta padrão do Render
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Brasilguard Core rodando na porta ${PORT}`);
-    console.log(`🧠 Inteligência: Gemini 2.5 Pro`);
+    console.log(`🧠 Inteligência Ativa: Gemini 3 Pro`);
 });

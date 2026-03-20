@@ -8,78 +8,39 @@
         :root {
             --base-bg: #09121f; --teal-gradient: linear-gradient(135deg, #1abc9c 0%, #2980b9 100%); 
             --emerald-low: #10a37f; --cyan-low: #0076a3; --glass: rgba(255, 255, 255, 0.03); 
-            --text-main: #f4f7f6; --text-sub: #b0bec5; --accent: #f39c12;
+            --text-main: #f4f7f6; --text-sub: #b0bec5;
         }
-
-        body { font-family: 'Avenir', 'Segoe UI', sans-serif; background-color: var(--base-bg); background-image: radial-gradient(at 10% 20%, rgba(16, 163, 127, 0.2) 0px, transparent 50%), radial-gradient(at 90% 80%, rgba(0, 118, 163, 0.2) 0px, transparent 50%); margin: 0; padding: 20px 40px; color: var(--text-main); min-height: 100vh; }
-        .l-container { max-width: 1200px; margin: 0 auto; position: relative; }
-
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .header-top h1 { font-size: 2rem; margin: 0; background: var(--teal-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
-        .btn-sair { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-sair:hover { background: #ff6b6b; color: white; }
-
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--base-bg); color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; }
+        .l-container { max-width: 1200px; margin: 0 auto; }
+        .box-padrao { background: var(--glass); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
         .nav-abas { display: flex; gap: 15px; margin-bottom: 30px; }
-        .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
-        .btn-aba:hover { background: rgba(26, 188, 156, 0.1); color: white; }
-        .btn-aba.ativa { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; border-color: transparent; box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3); }
-
-        .aba-conteudo { display: none; animation: fadeIn 0.4s ease; }
+        .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-aba.ativa { background: var(--teal-gradient); color: white; border: none; }
+        .aba-conteudo { display: none; }
         .aba-conteudo.ativa { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .box-padrao { background: var(--glass); backdrop-filter: blur(10px); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; }
-        .box-padrao h3 { margin-top: 0; font-size: 1.3rem; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(26, 188, 156, 0.2); border-radius: 8px; color: var(--text-main); font-family: inherit; margin-bottom: 15px; box-sizing: border-box; transition: 0.3s; }
-        input:focus, textarea:focus { outline: none; border-color: #1abc9c; box-shadow: 0 0 10px rgba(26, 188, 156, 0.1); }
-        .btn-acao { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 0.85em; }
-        
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        th { text-align: left; padding: 12px 15px; color: var(--emerald-low); font-size: 0.8em; }
-        tr { background: rgba(0,0,0,0.2); }
-        td { padding: 15px; }
-        .btn-sm { background: transparent; color: #1abc9c; border: 1px solid #1abc9c; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
-
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
-        .modal-content { background: var(--base-bg); border: 1px solid rgba(26, 188, 156, 0.5); margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; position: relative; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .lbl { font-size: 0.85rem; color: #1abc9c; font-weight: bold; display: block; margin-bottom: 5px; }
-        #tela-sistema, #tela-bloqueio { display: none; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: var(--base-bg); margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; border: 1px solid #1abc9c; }
+        .btn-acao { background: var(--teal-gradient); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
     <div id="modal-os" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="fecharModal()">&times;</span>
-            <h3 style="color:#1abc9c;">📋 Nova Ordem de Serviço</h3>
-            <p id="modal-cliente" style="color:var(--text-sub);"></p>
-
-            <label class="lbl">Problema Relatado:</label>
-            <input type="text" id="os-problema" placeholder="Ex: Câmera sem imagem">
-
-            <label class="lbl">Serviço Executado / Solução:</label>
-            <textarea id="os-servico" placeholder="Ex: Troca de conector..." style="height: 100px;"></textarea>
-
-            <button class="btn-acao" style="width:100%; margin-bottom: 10px;" onclick="salvarOS()">💾 Salvar no Banco</button>
-            <button class="btn-acao" id="btn-gerar-ia" style="width:100%; background: linear-gradient(90deg, #8e44ad, #9b59b6);" onclick="gerarRelatorioIA(event)">✨ Criar Relatório IA p/ Cliente</button>
-        </div>
-    </div>
-
-    <div id="tela-bloqueio" class="l-container" style="text-align:center; padding-top:100px;">
-        <div class="box-padrao" style="max-width:500px; margin:0 auto;">
-            <h2 style="color:#ff6b6b;">Acesso Restrito 🔒</h2>
-            <p>Assinatura pendente ou expirada.</p>
-            <button id="btn-zap-liberar" class="btn-acao" style="width:100%;">📲 Chamar Suporte Brasilguard</button>
+            <h3 style="color:#1abc9c">📋 Ordem de Serviço</h3>
+            <p id="modal-cliente"></p>
+            <input type="text" id="os-problema" placeholder="Problema Relatado">
+            <textarea id="os-servico" placeholder="Solução Técnica" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+            <button class="btn-acao" onclick="salvarOS()">💾 Salvar</button>
+            <button class="btn-acao" style="background: #8e44ad; margin-top:10px;" onclick="gerarRelatorioIA(event)">✨ Gerar Relatório IA</button>
+            <button class="btn-acao" style="background: #555; margin-top:10px;" onclick="fecharModal()">Fechar</button>
         </div>
     </div>
 
     <div id="tela-sistema" class="l-container">
-        <div class="header-top">
-            <h1>BRASILGUARD SISTEMAS</h1>
-            <button class="btn-sair" onclick="deslogarSistema()">🚪 Sair</button>
-        </div>
-
+        <h1>BRASILGUARD SISTEMAS</h1>
         <div class="nav-abas">
             <button class="btn-aba ativa" onclick="mudarAba('hunter', this)">🎯 Radar & Hunter</button>
             <button class="btn-aba" onclick="mudarAba('servicedesk', this)">🛠️ Service Desk</button>
@@ -87,68 +48,26 @@
 
         <div id="aba-hunter" class="aba-conteudo ativa">
             <div class="box-padrao">
-                <h3>📋 Leads Capturados (Cofre)</h3>
-                <table>
-                    <thead><tr><th>Telefone</th><th>Origem</th><th>Status</th><th>Ação</th></tr></thead>
-                    <tbody id="tabela-leads"></tbody>
-                </table>
+                <h3>📋 Leads (Cofre)</h3>
+                <table id="tabela-leads"></table>
             </div>
         </div>
 
         <div id="aba-servicedesk" class="aba-conteudo">
             <div class="box-padrao">
-                <h3>➕ Novo Cliente</h3>
-                <input type="text" id="sd-nome" placeholder="Nome do Cliente">
-                <button class="btn-acao" onclick="salvarClienteSD()">💾 Salvar Cliente</button>
-            </div>
-            <div class="box-padrao">
                 <h3>🏢 Clientes Ativos</h3>
                 <table>
-                    <thead><tr><th>Nome</th><th>Ação</th></tr></thead>
-                    <tbody id="tabela-clientes-sd"></tbody>
+                    <tr><td>Condomínio Exemplo</td><td><button onclick="abrirModalOS('Condomínio Exemplo')">+ O.S.</button></td></tr>
                 </table>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyABi8se1JZzGNZtsYds6ARxkEAzuAQnbTo",
-            authDomain: "brasilguard-cofre.firebaseapp.com",
-            projectId: "brasilguard-cofre",
-            storageBucket: "brasilguard-cofre.firebasestorage.app",
-            messagingSenderId: "948181992816",
-            appId: "1:948181992816:web:dc02c06f6d17a078cefbb5"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        window.db = db;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                window.usuarioLogadoId = user.uid;
-                // Verificação simplificada de acesso (Ajuste conforme sua lógica de data)
-                document.getElementById('tela-sistema').style.display = "block";
-                window.carregarLeads();
-                window.carregarClientesSD();
-            } else {
-                window.location.replace("login.html");
-            }
-        });
-
-        window.deslogarSistema = () => signOut(auth);
-    </script>
-
     <script>
         const BASE_URL = 'https://brasilguard-final.onrender.com';
         window.clienteAtualOS = "";
 
+        // FUNÇÃO DE MUDAR ABAS (DEFINIDA NO TOPO)
         function mudarAba(abaId, btn) {
             document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.btn-aba').forEach(b => b.classList.remove('ativa'));
@@ -156,86 +75,47 @@
             btn.classList.add('ativa');
         }
 
-        window.abrirModalOS = (nome) => {
+        function abrirModalOS(nome) {
             window.clienteAtualOS = nome;
             document.getElementById('modal-cliente').innerText = "Cliente: " + nome;
             document.getElementById('modal-os').style.display = "block";
-        };
-
-        window.fecharModal = () => document.getElementById('modal-os').style.display = "none";
-
-        // --- MÁGICA DA IA CORRIGIDA ---
-        window.gerarRelatorioIA = async function(event) {
-    if(event) event.preventDefault();
-
-    const prob = document.getElementById('os-problema').value;
-    const serv = document.getElementById('os-servico').value;
-    const cliente = window.clienteAtualOS || "Cliente Brasilguard";
-
-    const btn = event.target;
-    const textoOriginal = btn.innerText;
-    btn.innerText = "⏳ IA PROCESSANDO (2.5 PRO)...";
-    btn.disabled = true;
-
-    try {
-        const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cliente, problema: prob, servico: serv })
-        });
-
-        const dados = await res.json();
-
-        if(dados.sucesso) {
-            window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
-            window.fecharModal();
-        } else {
-            alert("Erro: " + dados.erro);
         }
-    } catch(e) {
-        alert("Erro na conexão com a Nave-Mãe.");
-    } finally {
-        btn.innerText = textoOriginal;
-        btn.disabled = false;
-    }
-};
 
-                const dados = await res.json(); // AQUI A VARIÁVEL 'DADOS' NASCE
+        function fecharModal() { document.getElementById('modal-os').style.display = "none"; }
+
+        async function gerarRelatorioIA(event) {
+            if(event) event.preventDefault();
+            const prob = document.getElementById('os-problema').value;
+            const serv = document.getElementById('os-servico').value;
+            const btn = event.target;
+            
+            btn.innerText = "⏳ PROCESSANDO...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cliente: window.clienteAtualOS, problema: prob, servico: serv })
+                });
+
+                const dados = await res.json(); // AGORA 'DADOS' ESTÁ DEFINIDO AQUI
 
                 if(dados.sucesso) {
-                    const msg = encodeURIComponent(dados.relatorio);
-                    window.open(`https://wa.me/?text=${msg}`, '_blank');
-                    window.fecharModal();
+                    window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
+                    fecharModal();
                 } else {
-                    alert("Erro na IA: " + (dados.erro || "Verifique o Render"));
+                    alert("Erro: " + dados.erro);
                 }
             } catch (e) {
-                alert("Erro ao conectar com a Nave-Mãe.");
+                alert("Erro de conexão com o Render.");
             } finally {
-                btn.innerText = originalText;
+                btn.innerText = "✨ Gerar Relatório IA";
                 btn.disabled = false;
             }
-        };
+        }
 
-        window.carregarLeads = async () => {
-            const tbody = document.getElementById('tabela-leads');
-            try {
-                const res = await fetch(`${BASE_URL}/api/leads?clienteId=${window.usuarioLogadoId}`);
-                const leads = await res.json();
-                tbody.innerHTML = leads.length ? "" : "<tr><td colspan='4'>Nenhum lead.</td></tr>";
-                leads.forEach(l => {
-                    tbody.innerHTML += `<tr><td>${l.telefone}</td><td>${l.origem}</td><td>${l.status}</td><td><button class='btn-sm'>💬</button></td></tr>`;
-                });
-            } catch (e) { tbody.innerHTML = "Erro ao carregar leads."; }
-        };
-
-        window.carregarClientesSD = async () => {
-            const tbody = document.getElementById('tabela-clientes-sd');
-            // Busca do Firestore (Exemplo simplificado)
-            tbody.innerHTML = "<tr><td>Condomínio Exemplo</td><td><button class='btn-sm' onclick='abrirModalOS(\"Condomínio Exemplo\")'>+ O.S.</button></td></tr>";
-        };
-
-        window.salvarOS = () => { alert("Salvo no banco!"); window.fecharModal(); };
+        function salvarOS() { alert("Salvo!"); fecharModal(); }
     </script>
 </body>
 </html>
