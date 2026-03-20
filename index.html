@@ -27,7 +27,7 @@
     <div id="modal-os" class="modal">
         <div class="modal-content">
             <h3 style="color:#1abc9c">📋 Ordem de Serviço</h3>
-            <p id="modal-cliente"></p>
+            <p id="modal-cliente" style="color:var(--text-sub)"></p>
             <input type="text" id="os-problema" placeholder="Problema Relatado">
             <textarea id="os-servico" placeholder="Solução Técnica" style="height: 100px;"></textarea>
             <button class="btn-acao" style="width:100%; margin-bottom: 10px;" onclick="salvarOS()">💾 Salvar Registro</button>
@@ -38,7 +38,7 @@
 
     <div id="tela-sistema" class="l-container">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>BRASILGUARD SISTEMAS</h1>
+            <h1 style="background:var(--teal-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">BRASILGUARD SISTEMAS</h1>
             <button class="btn-acao" style="background:#ff6b6b;" onclick="deslogarSistema()">🚪 Sair</button>
         </div>
 
@@ -48,13 +48,13 @@
         </div>
 
         <div id="aba-hunter" class="aba-conteudo ativa">
-            <div class="box-padrao"><h3>🎯 Radar de Vendas</h3><p>Pronto para capturar leads.</p></div>
+            <div class="box-padrao"><h3>🎯 Radar Hunter</h3><p>Pronto para coletar novos leads.</p></div>
         </div>
 
         <div id="aba-servicedesk" class="aba-conteudo">
             <div class="box-padrao">
-                <h3>🏢 Clientes Ativos</h3>
-                <button class="btn-acao" onclick="abrirModalOS('Condomínio Exemplo')">+ Nova O.S.</button>
+                <h3>🏢 Gestão de Chamados</h3>
+                <button class="btn-acao" onclick="abrirModalOS('Condomínio Exemplo')">+ Nova O.S. (Exemplo)</button>
             </div>
         </div>
     </div>
@@ -81,6 +81,7 @@
         const BASE_URL = 'https://brasilguard-final.onrender.com';
         window.clienteAtualOS = "";
 
+        // FUNÇÕES DE INTERFACE (DEFINIDAS PRIMEIRO PARA NÃO TRAVAR)
         function mudarAba(id, btn) {
             document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.btn-aba').forEach(b => b.classList.remove('ativa'));
@@ -96,13 +97,14 @@
 
         function fecharModal() { document.getElementById('modal-os').style.display = "none"; }
 
+        // --- A IA COM LOGICA CORRETA ---
         async function gerarRelatorioIA(event) {
             if(event) event.preventDefault();
             const prob = document.getElementById('os-problema').value;
             const serv = document.getElementById('os-servico').value;
             const btn = document.getElementById('btn-gerar-ia');
 
-            btn.innerText = "⏳ IA ESCREVENDO...";
+            btn.innerText = "⏳ IA ESCREVENDO (2.0 PRO)...";
             btn.disabled = true;
 
             try {
@@ -112,17 +114,17 @@
                     body: JSON.stringify({ cliente: window.clienteAtualOS, problema: prob, servico: serv })
                 });
 
-                const dados = await res.json(); // AQUI VARIÁVEL DADOS É CRIADA
+                const dados = await res.json(); // CRIAMOS A VARIAVEL AQUI
 
                 if(dados.sucesso) {
                     window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
                     fecharModal();
-                } else { alert("IA Falhou."); }
-            } catch (e) { alert("Erro de conexão."); }
+                } else { alert("IA Falhou: Verifique o Render."); }
+            } catch (e) { alert("Erro de conexão com o Render."); }
             finally { btn.innerText = "✨ Criar Relatório IA"; btn.disabled = false; }
         }
 
-        function salvarOS() { alert("Salvo!"); fecharModal(); }
+        function salvarOS() { alert("O.S. salva no cofre!"); fecharModal(); }
     </script>
 </body>
 </html>

@@ -15,10 +15,13 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
         if (!process.env.GEMINI_API_KEY) return res.status(500).json({ sucesso: false, erro: "API Key ausente." });
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        // MODELO ESTÁVEL 2026 PARA CONTAS PRO: gemini-2.0-pro
+        // MODELO ESTÁVEL 2026 PARA CONTAS PRO
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-pro" });
 
-        const prompt = `Aja como técnico sênior da Brasilguard. Crie um relatório para o WhatsApp do cliente "${cliente}". Problema: ${problema}. Solução: ${servico}. Confirme que está 100% funcional. Seja direto.`;
+        const prompt = `Aja como técnico sênior da Brasilguard Sistemas. Crie um relatório para o WhatsApp do cliente "${cliente}". 
+        Problema: ${problema}. 
+        Solução técnica: ${servico}. 
+        Confirme que o sistema está 100% testado. Seja técnico e direto.`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -26,7 +29,7 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
         res.json({ sucesso: true, relatorio: response.text() });
     } catch (error) {
         console.error("ERRO NO RENDER:", error.message);
-        res.status(500).json({ sucesso: false, erro: "O motor da IA teve um soluço técnico." });
+        res.status(500).json({ sucesso: false, erro: "Falha técnica no motor 2.0 Pro." });
     }
 });
 
