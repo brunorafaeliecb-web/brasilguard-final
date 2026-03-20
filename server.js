@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => res.send('🚀 Nave-Mãe Brasilguard Online | Gemini 2.0 Pro Ativo'));
+app.get('/', (req, res) => res.send('🚀 Nave-Mãe Brasilguard Online | Gemini Pro Ativo'));
 
 app.post('/api/hunter/gerar-os', async (req, res) => {
     try {
@@ -15,8 +15,8 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
         if (!process.env.GEMINI_API_KEY) return res.status(500).json({ sucesso: false, erro: "API Key ausente." });
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        // MODELO ESTÁVEL 2026 PARA CONTAS PRO
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-pro" });
+        // USANDO O MODELO ESTÁVEL PARA EVITAR O ERRO 404 NO RENDER
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
         const prompt = `Aja como técnico sênior da Brasilguard Sistemas. Crie um relatório para o WhatsApp do cliente "${cliente}". 
         Problema: ${problema}. 
@@ -29,7 +29,7 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
         res.json({ sucesso: true, relatorio: response.text() });
     } catch (error) {
         console.error("ERRO NO RENDER:", error.message);
-        res.status(500).json({ sucesso: false, erro: "Falha técnica no motor 2.0 Pro." });
+        res.status(500).json({ sucesso: false, erro: "O motor da IA teve um soluço. Verifique os logs." });
     }
 });
 
