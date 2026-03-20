@@ -3,6 +3,10 @@ const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
+// --- LINHA DE DEBUG ADICIONADA ABAIXO ---
+console.log("MINHA CHAVE É:", process.env.GEMINI_API_KEY ? "ENCONTRADA" : "NÃO ENCONTRADA");
+// -----------------------------------------
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -16,7 +20,7 @@ app.post('/api/hunter/gerar-os', async (req, res) => {
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         
-        // CORREÇÃO AQUI: Usando o modelo real 'gemini-1.5-flash'
+        // MOTOR ATUALIZADO: gemini-1.5-flash (Estável e Rápido)
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `Aja como técnico sênior da Brasilguard Sistemas. Crie um relatório para o WhatsApp do cliente "${cliente}". 
