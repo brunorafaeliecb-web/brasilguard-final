@@ -14,51 +14,89 @@
         .box-padrao { background: var(--glass); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
         .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-aba.ativa { background: var(--teal-gradient); color: white; border: none; box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3); }
-        .aba-conteudo { display: none; }
+        .aba-conteudo { display: none; animation: fadeIn 0.3s ease-in-out; }
         .aba-conteudo.ativa { display: block; }
-        .btn-acao { background: var(--teal-gradient); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
-        .modal-content { background: var(--base-bg); border: 1px solid #1abc9c; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; }
-        input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid #1abc9c; border-radius: 8px; color: white; margin-bottom: 10px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-acao { background: var(--teal-gradient); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
+        input, select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid #1abc9c; border-radius: 8px; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { color: #1abc9c; }
     </style>
 </head>
 <body>
 
-    <div id="modal-os" class="modal">
-        <div class="modal-content">
-            <h3 style="color:#1abc9c">📋 Ordem de Serviço</h3>
-            <p id="modal-cliente" style="color:var(--text-sub)"></p>
-            <input type="text" id="os-problema" placeholder="Problema Relatado">
-            <textarea id="os-servico" placeholder="Solução Técnica" style="height: 100px;"></textarea>
-            <button class="btn-acao" onclick="salvarOS()">💾 Salvar Registro</button>
-            <button class="btn-acao" id="btn-ia" style="background: #8e44ad;" onclick="gerarRelatorioIA(event)">✨ Gerar Relatório IA (Gemini 3)</button>
-            <button class="btn-acao" style="background: #555;" onclick="fecharModal()">Fechar</button>
-        </div>
-    </div>
-
     <div id="tela-sistema" class="l-container">
-        <h1 style="background: var(--teal-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BRASILGUARD SISTEMAS</h1>
-        
-        <div style="display:flex; gap:10px; margin: 20px 0;">
-            <button class="btn-aba ativa" id="aba-hunter-btn" onclick="mudarAba('hunter', this)">🎯 Radar & Hunter</button>
-            <button class="btn-aba" id="aba-servicedesk-btn" onclick="mudarAba('servicedesk', this)">🛠️ Service Desk</button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1 style="background: var(--teal-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BRASILGUARD SISTEMAS</h1>
+            <button class="btn-aba" style="background:#ff6b6b; color:white;" onclick="deslogarSistema()">🚪 Sair</button>
         </div>
 
-        <div id="aba-hunter" class="aba-conteudo ativa">
-            <div class="box-padrao"><h3>🎯 Radar Hunter</h3><p>Monitorando leads ativos...</p></div>
+        <div style="display:flex; gap:10px; margin: 20px 0;">
+            <button class="btn-aba ativa" onclick="mudarAba('clientes')">🏢 Clientes & Ativos</button>
+            <button class="btn-aba" onclick="mudarAba('servicedesk')">🛠️ Service Desk</button>
+            <button class="btn-aba" onclick="mudarAba('hunter')">🎯 Radar Hunter</button>
+        </div>
+
+        <div id="aba-clientes" class="aba-conteudo ativa">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                
+                <div class="box-padrao">
+                    <h3 style="color:#1abc9c; margin-top:0;">➕ Novo Condomínio/Cliente</h3>
+                    <input type="text" id="cad-cli-nome" placeholder="Nome (Ex: Condomínio Bosque)">
+                    <input type="text" id="cad-cli-cnpj" placeholder="CNPJ / Documento">
+                    <button class="btn-acao" onclick="salvarClienteNoBanco()">💾 Salvar Cliente</button>
+                </div>
+
+                <div class="box-padrao">
+                    <h3 style="color:#1abc9c; margin-top:0;">📡 Vincular Equipamento</h3>
+                    <select id="cad-eq-cliente">
+                        <option value="">Carregando clientes...</option>
+                    </select>
+                    <select id="cad-eq-tipo">
+                        <option value="DVR">DVR / NVR</option>
+                        <option value="Roteador">Roteador / Switch</option>
+                        <option value="Câmera IP">Câmera IP</option>
+                        <option value="Servidor">Servidor</option>
+                    </select>
+                    <input type="text" id="cad-eq-ip" placeholder="IP / URL de Acesso">
+                    <button class="btn-acao" onclick="salvarEquipamentoNoBanco()">🔗 Vincular ao Cliente</button>
+                </div>
+            </div>
+
+            <div class="box-padrao">
+                <h3 style="margin-top:0;">📋 Cofre de Equipamentos Ativos</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Equipamento</th>
+                            <th>IP / URL</th>
+                            <th>ID Cliente (Vínculo)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-equipamentos">
+                        <tr><td colspan="3">Nenhum equipamento cadastrado.</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="aba-servicedesk" class="aba-conteudo">
             <div class="box-padrao">
-                <h3>🏢 Gestão de Chamados</h3>
-                <button class="btn-aba" style="padding:10px 20px;" onclick="abrirModalOS('Condomínio Exemplo')">+ Nova O.S.</button>
+                <h3>🛠️ Gestão de Chamados (Em breve vinculado aos dados acima)</h3>
             </div>
         </div>
+        <div id="aba-hunter" class="aba-conteudo">
+            <div class="box-padrao"><h3>🎯 Radar Hunter</h3></div>
+        </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyABi8se1JZzGNZtsYds6ARxkEAzuAQnbTo",
             authDomain: "brasilguard-cofre.firebaseapp.com",
@@ -67,58 +105,132 @@
             messagingSenderId: "948181992816",
             appId: "1:948181992816:web:dc02c06f6d17a078cefbb5"
         };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        onAuthStateChanged(auth, (user) => { if(!user) window.location.replace("login.html"); });
+        const db = getFirestore(app); // Ativando o Banco de Dados
+
+        // Expondo as funções do banco para o window (para podermos chamar nos botões HTML)
+        window.dbCollection = collection;
+        window.dbAddDoc = addDoc;
+        window.dbGetDocs = getDocs;
+        window.db = db;
+
+        window.deslogarSistema = () => signOut(auth).then(() => window.location.replace("login.html"));
+        
+        onAuthStateChanged(auth, (user) => { 
+            if(!user) {
+                window.location.replace("login.html"); 
+            } else {
+                // Quando logar, carrega os dados do banco!
+                carregarClientesNoSelect();
+                carregarEquipamentosNaTabela();
+            }
+        });
     </script>
 
     <script>
-        const BASE_URL = 'https://brasilguard-final.onrender.com';
-        window.clienteAtualOS = "";
-
-        // NAVEGAÇÃO (DEFINIDA NO TOPO PARA NÃO TRAVAR)
-        function mudarAba(id, btn) {
+        // --- NAVEGAÇÃO ---
+        function mudarAba(id) {
             document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.btn-aba').forEach(b => b.classList.remove('ativa'));
             document.getElementById('aba-' + id).classList.add('ativa');
-            btn.classList.add('ativa');
+            event.target.classList.add('ativa');
         }
 
-        function abrirModalOS(nome) {
-            window.clienteAtualOS = nome;
-            document.getElementById('modal-cliente').innerText = "Cliente: " + nome;
-            document.getElementById('modal-os').style.display = "block";
-        }
+        // --- FUNÇÕES DE BANCO DE DADOS (CRUD) ---
 
-        function fecharModal() { document.getElementById('modal-os').style.display = "none"; }
+        // 1. Salvar Cliente
+        async function salvarClienteNoBanco() {
+            const nome = document.getElementById('cad-cli-nome').value;
+            const cnpj = document.getElementById('cad-cli-cnpj').value;
 
-        async function gerarRelatorioIA(event) {
-            if(event) event.preventDefault();
-            const prob = document.getElementById('os-problema').value;
-            const serv = document.getElementById('os-servico').value;
-            const btn = document.getElementById('btn-ia');
-
-            btn.innerText = "⏳ IA ESCREVENDO...";
-            btn.disabled = true;
+            if(!nome) return alert("Preencha o nome do cliente!");
 
             try {
-                const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cliente: window.clienteAtualOS, problema: prob, servico: serv })
+                event.target.innerText = "⏳ Salvando...";
+                await window.dbAddDoc(window.dbCollection(window.db, "clientes"), {
+                    nome: nome,
+                    cnpj: cnpj,
+                    dataCriacao: new Date().toISOString()
                 });
-
-                const dados = await res.json(); // A VARIÁVEL DADOS É CRIADA AQUI
-
-                if(dados.sucesso) {
-                    window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
-                    fecharModal();
-                } else { alert("IA Falhou no Render."); }
-            } catch (e) { alert("Erro de conexão com o Render."); }
-            finally { btn.innerText = "✨ Gerar Relatório IA (Gemini 3)"; btn.disabled = false; }
+                alert("✅ Cliente salvo com sucesso no Firebase!");
+                document.getElementById('cad-cli-nome').value = ""; // Limpa
+                carregarClientesNoSelect(); // Atualiza a lista
+            } catch (error) {
+                console.error("Erro ao salvar cliente:", error);
+                alert("Erro ao salvar. Verifique o console.");
+            } finally {
+                event.target.innerText = "💾 Salvar Cliente";
+            }
         }
 
-        function salvarOS() { alert("Salvo!"); fecharModal(); }
+        // 2. Carregar Clientes no Select
+        async function carregarClientesNoSelect() {
+            const select = document.getElementById('cad-eq-cliente');
+            try {
+                const querySnapshot = await window.dbGetDocs(window.dbCollection(window.db, "clientes"));
+                select.innerHTML = '<option value="">Selecione um Cliente...</option>'; // Reseta
+                
+                querySnapshot.forEach((doc) => {
+                    const dados = doc.data();
+                    select.innerHTML += `<option value="${doc.id}">${dados.nome}</option>`;
+                });
+            } catch (error) {
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            }
+        }
+
+        // 3. Salvar Equipamento Vinculado
+        async function salvarEquipamentoNoBanco() {
+            const clienteId = document.getElementById('cad-eq-cliente').value;
+            const tipo = document.getElementById('cad-eq-tipo').value;
+            const ip = document.getElementById('cad-eq-ip').value;
+
+            if(!clienteId || !ip) return alert("Selecione o cliente e preencha o IP!");
+
+            try {
+                event.target.innerText = "⏳ Vinculando...";
+                await window.dbAddDoc(window.dbCollection(window.db, "equipamentos"), {
+                    clienteId: clienteId,
+                    tipo: tipo,
+                    ip: ip
+                });
+                alert("✅ Equipamento vinculado ao cliente!");
+                document.getElementById('cad-eq-ip').value = ""; // Limpa
+                carregarEquipamentosNaTabela(); // Atualiza a tabela
+            } catch (error) {
+                alert("Erro ao salvar equipamento.");
+            } finally {
+                event.target.innerText = "🔗 Vincular ao Cliente";
+            }
+        }
+
+        // 4. Listar Equipamentos na Tabela
+        async function carregarEquipamentosNaTabela() {
+            const tbody = document.getElementById('tabela-equipamentos');
+            try {
+                const querySnapshot = await window.dbGetDocs(window.dbCollection(window.db, "equipamentos"));
+                if(querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="3">Nenhum equipamento cadastrado.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = ""; // Limpa a tabela
+                querySnapshot.forEach((doc) => {
+                    const eq = doc.data();
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${eq.tipo}</strong></td>
+                            <td style="color:#1abc9c;">${eq.ip}</td>
+                            <td style="font-size: 0.8em; color: gray;">${eq.clienteId}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="3">Erro ao buscar no banco.</td></tr>';
+            }
+        }
     </script>
 </body>
 </html>
