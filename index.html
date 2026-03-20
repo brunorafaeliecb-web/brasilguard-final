@@ -1,327 +1,50 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Brasilguard [BIOMIMETICS 2026]</title>
-    <style>
-        :root {
-            --base-bg: #09121f; --teal-gradient: linear-gradient(135deg, #1abc9c 0%, #2980b9 100%); 
-            --emerald-low: #10a37f; --cyan-low: #0076a3; --glass: rgba(255, 255, 255, 0.03); 
-            --text-main: #f4f7f6; --text-sub: #b0bec5; --accent: #f39c12;
-        }
-
-        body { font-family: 'Avenir', 'Segoe UI', sans-serif; background-color: var(--base-bg); background-image: radial-gradient(at 10% 20%, rgba(16, 163, 127, 0.2) 0px, transparent 50%), radial-gradient(at 90% 80%, rgba(0, 118, 163, 0.2) 0px, transparent 50%); margin: 0; padding: 20px 40px; color: var(--text-main); min-height: 100vh; }
-        .l-container { max-width: 1200px; margin: 0 auto; position: relative; }
-
-        /* HEADER E LOGOUT */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .header-top h1 { font-size: 2rem; margin: 0; background: var(--teal-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
-        .btn-sair { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-sair:hover { background: #ff6b6b; color: white; }
-
-        /* NAVEGAÇÃO DE ABAS */
-        .nav-abas { display: flex; gap: 15px; margin-bottom: 30px; }
-        .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
-        .btn-aba:hover { background: rgba(26, 188, 156, 0.1); color: white; }
-        .btn-aba.ativa { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; border-color: transparent; box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3); }
-
-        /* PAINEIS */
-        .aba-conteudo { display: none; animation: fadeIn 0.4s ease; }
-        .aba-conteudo.ativa { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ESTILOS GERAIS */
-        .box-padrao { background: var(--glass); backdrop-filter: blur(10px); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; }
-        .box-padrao h3 { margin-top: 0; font-size: 1.3rem; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(26, 188, 156, 0.2); border-radius: 8px; color: var(--text-main); font-family: inherit; margin-bottom: 15px; box-sizing: border-box; transition: 0.3s; }
-        input:focus, textarea:focus { outline: none; border-color: #1abc9c; box-shadow: 0 0 10px rgba(26, 188, 156, 0.1); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-acao { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 0.85em; }
-        .btn-acao:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(26, 188, 156, 0.2); }
-        
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 10px; }
-        th { text-align: left; padding: 12px 15px; color: var(--emerald-low); text-transform: uppercase; font-size: 0.8em; letter-spacing: 1px; font-weight: 700; }
-        tr { background: rgba(0,0,0,0.2); transition: 0.2s; }
-        tr:hover { background: rgba(255,255,255,0.05); transform: scale(1.01); }
-        td { padding: 15px; border-top: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.95rem; }
-        .btn-sm { background: transparent; color: #1abc9c; border: 1px solid #1abc9c; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.2s; }
-        .btn-sm:hover { background: #1abc9c; color: white; }
-
-        /* TELA DE BLOQUEIO */
-        #tela-bloqueio { display: none; text-align: center; padding: 50px 20px; }
-        .paywall-box { background: var(--glass); border: 1px solid rgba(255, 107, 107, 0.3); padding: 50px; border-radius: 16px; max-width: 600px; margin: 0 auto; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .paywall-box h2 { color: #ff6b6b; margin-top: 0; }
-        .btn-pay { background: linear-gradient(90deg, #1abc9c 0%, #16a085 100%); color: white; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; text-decoration: none; display: block; margin-bottom: 15px; }
-        .btn-whatsapp { background: transparent; color: #25D366; border: 2px solid rgba(37, 211, 102, 0.3); padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; display: block; }
-
-        /* O MODAL DE O.S. */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
-        .modal-content { background: var(--base-bg); border: 1px solid rgba(26, 188, 156, 0.5); margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; color: white; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; margin-top: -10px; }
-        .close:hover { color: white; }
-        .lbl { font-size: 0.85rem; color: #1abc9c; font-weight: bold; margin-bottom: 5px; display: block; }
-        
-        #tela-sistema { display: none; }
-    </style>
-</head>
-<body>
-
-    <div id="modal-os" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModal()">&times;</span>
-            <h3 style="margin-top:0; color:#1abc9c; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">📋 Nova Ordem de Serviço</h3>
-            <p id="modal-cliente" style="color:var(--text-sub); margin-bottom: 20px;"></p>
-
-            <label class="lbl">Problema Relatado:</label>
-            <input type="text" id="os-problema" placeholder="Ex: Câmera 04 sem sinal de vídeo">
-
-            <label class="lbl">Serviço Executado / Solução:</label>
-            <textarea id="os-servico" placeholder="Ex: Troca de conector BNC e refação do cabeamento..." style="height: 100px;"></textarea>
-
-            <button class="btn-acao" style="width:100%; margin-bottom: 10px;" onclick="salvarOS()">💾 Salvar Registro no Banco</button>
-            <button class="btn-acao" style="width:100%; background: linear-gradient(90deg, #8e44ad, #9b59b6);" onclick="gerarRelatorioIA(event)">✨ Criar Relatório IA p/ Cliente</button>
-        </div>
-    </div>
-
-    <div id="tela-bloqueio" class="l-container">
-        <button class="btn-sair" onclick="deslogarSistema()" style="position:absolute; right:0; top:-20px;">🚪 Sair</button>
-        <div class="paywall-box">
-            <h2>Acesso Restrito 🔒</h2>
-            <p>Sua assinatura do <strong>Brasilguard ERP</strong> expirou ou está pendente.</p>
-            <a href="https://linknabio.gg/brasilguard" target="_blank" class="btn-pay">💳 Realizar Pagamento Seguro</a>
-            <button id="btn-zap-liberar" class="btn-whatsapp">📲 Já paguei, liberar acesso</button>
-        </div>
-    </div>
-
-    <div id="tela-sistema" class="l-container">
-        <div class="header-top">
-            <h1>BRASILGUARD SISTEMAS</h1>
-            <button class="btn-sair" onclick="deslogarSistema()">🚪 Sair do Sistema</button>
-        </div>
-
-        <div class="nav-abas">
-            <button class="btn-aba ativa" onclick="mudarAba('hunter', this)">🎯 Radar & Hunter (Vendas)</button>
-            <button class="btn-aba" onclick="mudarAba('servicedesk', this)">🛠️ Service Desk (Operação)</button>
-        </div>
-
-        <div id="aba-hunter" class="aba-conteudo ativa">
-            <div class="box-padrao">
-                <h3>🧠 Treinamento da IA (Vendas)</h3>
-                <textarea id="texto-personalidade" placeholder="Aja como um vendedor de sistemas de segurança..."></textarea>
-                <button class="btn-acao" onclick="salvarTreinamento()">💾 Salvar Comportamento</button>
-                <span id="aviso-salvo" style="color: #1abc9c; font-weight: bold; margin-left: 15px; display: none;">Salvo na Nuvem</span>
-            </div>
-            <div class="box-padrao">
-                <h3>📋 Leads Capturados (Cofre)</h3>
-                <table>
-                    <thead><tr><th>Telefone</th><th>Origem</th><th>Status</th><th>Ação</th></tr></thead>
-                    <tbody id="tabela-leads"><tr><td colspan="4" style="text-align: center;">Buscando leads...</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="aba-servicedesk" class="aba-conteudo">
-            <div class="box-padrao">
-                <h3>➕ Cadastrar Novo Cliente / Condomínio</h3>
-                <div class="form-grid">
-                    <input type="text" id="sd-nome" placeholder="Nome do Cliente (Ex: Condomínio Central)">
-                    <input type="text" id="sd-telefone" placeholder="Telefone / WhatsApp">
-                    <input type="text" id="sd-endereco" placeholder="Endereço Completo" style="grid-column: span 2;">
-                </div>
-                <button class="btn-acao" onclick="salvarClienteSD()">💾 Salvar Cliente</button>
-                <span id="sd-aviso" style="color: #1abc9c; font-weight: bold; margin-left: 15px; display: none;">Cliente Salvo!</span>
-            </div>
-
-            <div class="box-padrao">
-                <h3>🏢 Carteira de Clientes Ativos</h3>
-                <table>
-                    <thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th><th>Ordens de Serviço</th></tr></thead>
-                    <tbody id="tabela-clientes-sd"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        // SUAS CHAVES DO FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyABi8se1JZzGNZtsYds6ARxkEAzuAQnbTo",
-            authDomain: "brasilguard-cofre.firebaseapp.com",
-            projectId: "brasilguard-cofre",
-            storageBucket: "brasilguard-cofre.firebasestorage.app",
-            messagingSenderId: "948181992816",
-            appId: "1:948181992816:web:dc02c06f6d17a078cefbb5"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        window.db = db;
-        window.usuarioLogadoId = null;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                window.usuarioLogadoId = user.uid;
-                const zapBtn = document.getElementById('btn-zap-liberar');
-                const textoZap = encodeURIComponent(`Fala chefe! Acabei de pagar a assinatura.\nMeu E-mail: ${user.email}\nMeu ID: ${user.uid}\nLibera aí!`);
-                zapBtn.onclick = () => window.open(`https://wa.me/5521986961362?text=${textoZap}`, '_blank');
-
-                try {
-                    const docSnap = await getDoc(doc(db, "assinaturas", user.uid));
-                    let acessoLiberado = false;
-                    if (docSnap.exists()) {
-                        const dados = docSnap.data();
-                        let hoje;
-                        try {
-                            const resTempo = await fetch('https://worldtimeapi.org/api/timezone/America/Sao_Paulo');
-                            const dadosTempo = await resTempo.json();
-                            hoje = new Date(dadosTempo.datetime);
-                        } catch (e) { hoje = new Date(); }
-                        const dataVencimento = new Date(dados.vencimento + "T23:59:59"); 
-                        if (dataVencimento >= hoje) acessoLiberado = true;
-                    }
-
-                    if (acessoLiberado) {
-                        document.getElementById('tela-bloqueio').style.display = "none";
-                        document.getElementById('tela-sistema').style.display = "block";
-                        window.carregarMemoria();
-                        window.carregarLeads();
-                        window.carregarClientesSD();
-                    } else {
-                        document.getElementById('tela-sistema').style.display = "none";
-                        document.getElementById('tela-bloqueio').style.display = "block";
-                    }
-                } catch (error) { document.getElementById('tela-bloqueio').style.display = "block"; }
-            } else { window.location.replace("login.html"); }
-        });
-
-        window.deslogarSistema = function() { signOut(auth).then(() => window.location.replace("login.html")); };
-        
-        // FUNÇÕES DO SERVICE DESK E CLIENTES
-        window.salvarClienteSD = async function() {
-            const nome = document.getElementById('sd-nome').value;
-            const telefone = document.getElementById('sd-telefone').value;
-            const endereco = document.getElementById('sd-endereco').value;
-            if(!nome) return alert("Preencha pelo menos o nome do cliente.");
-
-            try {
-                const refColecao = collection(db, "clientes_whitelabel", window.usuarioLogadoId, "clientes_finais");
-                await addDoc(refColecao, { nome: nome, telefone: telefone, endereco: endereco, dataCadastro: new Date().toISOString() });
-                
-                document.getElementById('sd-nome').value = ''; document.getElementById('sd-telefone').value = ''; document.getElementById('sd-endereco').value = '';
-                const aviso = document.getElementById('sd-aviso');
-                aviso.style.display = 'inline'; setTimeout(() => aviso.style.display = 'none', 3000);
-                window.carregarClientesSD(); 
-            } catch (e) { alert("Erro ao salvar cliente: " + e.message); }
-        };
-
-        window.carregarClientesSD = async function() {
-            try {
-                const refColecao = collection(db, "clientes_whitelabel", window.usuarioLogadoId, "clientes_finais");
-                const snapshot = await getDocs(refColecao);
-                const tbody = document.getElementById('tabela-clientes-sd');
-                tbody.innerHTML = '';
-                
-                if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-sub);">Nenhum cliente cadastrado ainda.</td></tr>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const c = doc.data();
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${c.nome}</strong></td>
-                        <td>${c.telefone || '-'}</td>
-                        <td>${c.endereco || '-'}</td>
-                        <td><button class="btn-sm" onclick="abrirModalOS('${c.nome}')">+ Nova O.S.</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (e) { console.error("Erro ao carregar clientes do ERP", e); }
-        };
-
-        // --- LÓGICA DO MODAL DE O.S. --- //
-        window.clienteAtualOS = null;
-
-        window.abrirModalOS = function(nomeCliente) {
-            window.clienteAtualOS = nomeCliente;
-            document.getElementById('modal-cliente').innerText = "Cliente: " + nomeCliente;
-            document.getElementById('modal-os').style.display = "block";
-        }
-
-        window.fecharModal = function() {
-            document.getElementById('modal-os').style.display = "none";
-            document.getElementById('os-problema').value = '';
-            document.getElementById('os-servico').value = '';
-        }
-
-        window.salvarOS = async function() {
-            alert(`✅ Ordem de Serviço de ${window.clienteAtualOS} registrada no cofre com sucesso!`);
-            window.fecharModal();
-        }
-    </script>
-
-    <script>
-        // O SEU BACKEND NO RENDER
-        const BASE_URL = 'https://brasilguard-final.onrender.com';
-
-        function mudarAba(abaId, elementoBotao) {
-            document.querySelectorAll('.aba-conteudo').forEach(aba => aba.classList.remove('ativa'));
-            document.querySelectorAll('.btn-aba').forEach(btn => btn.classList.remove('ativa'));
-            document.getElementById('aba-' + abaId).classList.add('ativa');
-            elementoBotao.classList.add('ativa');
-        }
-
-        // --- A NOVA MÁGICA DA IA AQUI --- //
+// --- A NOVA MÁGICA DA IA (CORRIGIDA) --- //
         window.gerarRelatorioIA = async function(event) {
+            if(event) event.preventDefault();
+
+            // 1. Captura os valores dos campos
             const prob = document.getElementById('os-problema').value;
             const serv = document.getElementById('os-servico').value;
-            
-            if(dados.sucesso) {
-                    window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
-                    window.fecharModal();
-                } else {
-                    // Isso vai mostrar o erro REAL que vem do Render
-                    alert("A IA disse: " + dados.erro);
-                }
+            const cliente = window.clienteAtualOS || "Cliente Brasilguard";
 
+            if(!prob || !serv) return alert("Por favor, preencha o problema e a solução.");
+
+            // 2. Feedback visual no botão
             const btn = event.target;
             const textoOriginal = btn.innerText;
-            
-            btn.innerText = "⏳ A IA está a escrever...";
+            btn.innerText = "⏳ AGENTE HUNTER ESCREVENDO...";
             btn.disabled = true;
             btn.style.opacity = "0.7";
 
             try {
-                // Chama a nova rota do seu Render
+                // 3. Chamada para a Nave-Mãe (Render)
                 const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
-                    method: 'POST', 
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        cliente: window.clienteAtualOS,
-                        problema: prob,
-                        servico: serv
+                        cliente: cliente, 
+                        problema: prob, 
+                        servico: serv 
                     })
                 });
 
+                // 4. AGORA a variável 'dados' é criada com a resposta
                 const dados = await res.json();
 
                 if(dados.sucesso) {
-                    window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
+                    // 5. Abre o WhatsApp com o relatório pronto
+                    const mensagem = encodeURIComponent(dados.relatorio);
+                    window.open(`https://wa.me/?text=${mensagem}`, '_blank');
                     window.fecharModal();
                 } else {
-                    alert("A IA teve um pequeno soluço. Verifique o console do Render.");
+                    alert("A IA teve um pequeno soluço: " + (dados.erro || "Verifique o console do Render."));
                 }
 
             } catch(e) {
-                alert("Erro na conexão com a Nave-Mãe. Aguarde o Render ligar ou verifique a rota.");
+                console.error("Erro na conexão:", e);
+                alert("Erro na conexão com a Nave-Mãe. Aguarde o Render ligar ou verifique a internet.");
             } finally {
+                // 6. Restaura o botão ao estado original
                 btn.innerText = textoOriginal;
                 btn.disabled = false;
                 btn.style.opacity = "1";
@@ -332,13 +55,17 @@
         window.salvarTreinamento = async function() {
             const texto = document.getElementById('texto-personalidade').value;
             try {
-                const res = await fetch(`${BASE_URL}/api/hunter/treinar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instrucoes: texto, clienteId: window.usuarioLogadoId }) });
+                const res = await fetch(`${BASE_URL}/api/hunter/treinar`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ instrucoes: texto, clienteId: window.usuarioLogadoId }) 
+                });
                 const dados = await res.json();
                 if(dados.sucesso) {
                     const aviso = document.getElementById('aviso-salvo');
                     aviso.style.display = 'inline'; setTimeout(() => aviso.style.display = 'none', 3000);
                 }
-            } catch(e) {}
+            } catch(e) { console.error("Erro ao salvar treinamento", e); }
         }
 
         window.carregarMemoria = async function() {
@@ -346,7 +73,7 @@
                 const res = await fetch(`${BASE_URL}/api/hunter/memoria?clienteId=${window.usuarioLogadoId}`);
                 const dados = await res.json();
                 if(dados.texto) document.getElementById('texto-personalidade').value = dados.texto;
-            } catch(e) {}
+            } catch(e) { console.error("Erro ao carregar memória", e); }
         }
 
         window.carregarLeads = async function() {
@@ -355,14 +82,16 @@
                 const leads = await resposta.json();
                 const tbody = document.getElementById('tabela-leads');
                 tbody.innerHTML = ''; 
-                if(leads.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-sub);">Cofre vazio. Capture leads no Maps.</td></tr>'; return; }
+                if(leads.length === 0) { 
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-sub);">Cofre vazio. Capture leads no Maps.</td></tr>'; 
+                    return; 
+                }
                 leads.forEach(lead => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `<td><strong>${lead.telefone}</strong></td><td>${lead.origem}</td><td><span style="padding: 6px 14px; border-radius: 20px; background: rgba(26, 188, 156, 0.1); color: #1abc9c; font-weight: bold; font-size: 0.8em; text-transform: uppercase;">${lead.status || 'Novo'}</span></td><td><button class="btn-sm" style="background: transparent; color: #fff; border: 2px solid rgba(37, 211, 102, 0.3); padding: 8px 15px;" onclick="alert('Integração RAG em andamento!')">💬 Chamar</button></td>`;
                     tbody.appendChild(tr);
                 });
-            } catch (erro) { document.getElementById('tabela-leads').innerHTML = '<tr><td colspan="4" style="color:red; text-align:center;">Erro na conexão com a Nave-Mãe.</td></tr>'; }
+            } catch (erro) { 
+                document.getElementById('tabela-leads').innerHTML = '<tr><td colspan="4" style="color:red; text-align:center;">Erro na conexão com a Nave-Mãe.</td></tr>'; 
+            }
         }
-    </script>
-</body>
-</html>
