@@ -12,14 +12,13 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--base-bg); margin: 0; padding: 20px; color: var(--text-main); }
         .l-container { max-width: 1200px; margin: 0 auto; }
         .box-padrao { background: var(--glass); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-        .nav-abas { display: flex; gap: 15px; margin-bottom: 30px; }
         .btn-aba { background: rgba(0,0,0,0.3); color: var(--text-sub); border: 1px solid rgba(255,255,255,0.1); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-aba.ativa { background: var(--teal-gradient); color: white; border: none; }
+        .btn-aba.ativa { background: var(--teal-gradient); color: white; border: none; box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3); }
         .aba-conteudo { display: none; }
         .aba-conteudo.ativa { display: block; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: var(--base-bg); margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; border: 1px solid #1abc9c; }
-        .btn-acao { background: var(--teal-gradient); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        .btn-acao { background: var(--teal-gradient); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+        .modal-content { background: var(--base-bg); border: 1px solid #1abc9c; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px; }
         input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid #1abc9c; border-radius: 8px; color: white; margin-bottom: 10px; }
     </style>
 </head>
@@ -29,41 +28,37 @@
         <div class="modal-content">
             <h3 style="color:#1abc9c">📋 Ordem de Serviço</h3>
             <p id="modal-cliente" style="color:var(--text-sub)"></p>
-            <input type="text" id="os-problema" placeholder="Problema Detectado">
-            <textarea id="os-servico" placeholder="Solução Aplicada" style="height: 100px;"></textarea>
+            <input type="text" id="os-problema" placeholder="Problema Relatado">
+            <textarea id="os-servico" placeholder="Solução Técnica" style="height: 100px;"></textarea>
             <button class="btn-acao" onclick="salvarOS()">💾 Salvar Registro</button>
-            <button class="btn-acao" id="btn-ia" style="background: #8e44ad;" onclick="gerarRelatorioIA(event)">✨ Gerar Relatório IA</button>
+            <button class="btn-acao" id="btn-ia" style="background: #8e44ad;" onclick="gerarRelatorioIA(event)">✨ Gerar Relatório IA (Gemini 3)</button>
             <button class="btn-acao" style="background: #555;" onclick="fecharModal()">Fechar</button>
         </div>
     </div>
 
     <div id="tela-sistema" class="l-container">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>BRASILGUARD SISTEMAS</h1>
-            <button class="btn-aba" style="background:#ff6b6b; color:white;" onclick="deslogarSistema()">🚪 Sair</button>
-        </div>
-
-        <div class="nav-abas">
-            <button class="btn-aba ativa" onclick="mudarAba('hunter', this)">🎯 Radar & Hunter</button>
-            <button class="btn-aba" onclick="mudarAba('servicedesk', this)">🛠️ Service Desk</button>
+        <h1 style="background: var(--teal-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BRASILGUARD SISTEMAS</h1>
+        
+        <div style="display:flex; gap:10px; margin: 20px 0;">
+            <button class="btn-aba ativa" id="aba-hunter-btn" onclick="mudarAba('hunter', this)">🎯 Radar & Hunter</button>
+            <button class="btn-aba" id="aba-servicedesk-btn" onclick="mudarAba('servicedesk', this)">🛠️ Service Desk</button>
         </div>
 
         <div id="aba-hunter" class="aba-conteudo ativa">
-            <div class="box-padrao"><h3>🎯 Radar Hunter</h3><p>Pronto para coletar leads.</p></div>
+            <div class="box-padrao"><h3>🎯 Radar Hunter</h3><p>Monitorando leads ativos...</p></div>
         </div>
 
         <div id="aba-servicedesk" class="aba-conteudo">
             <div class="box-padrao">
-                <h3>🏢 Gestão de Clientes</h3>
-                <button class="btn-aba" style="padding: 10px 20px;" onclick="abrirModalOS('Condomínio Exemplo')">+ Nova O.S.</button>
+                <h3>🏢 Gestão de Chamados</h3>
+                <button class="btn-aba" style="padding:10px 20px;" onclick="abrirModalOS('Condomínio Exemplo')">+ Nova O.S.</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         const firebaseConfig = {
             apiKey: "AIzaSyABi8se1JZzGNZtsYds6ARxkEAzuAQnbTo",
             authDomain: "brasilguard-cofre.firebaseapp.com",
@@ -74,7 +69,6 @@
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        window.deslogarSistema = () => signOut(auth).then(() => window.location.replace("login.html"));
         onAuthStateChanged(auth, (user) => { if(!user) window.location.replace("login.html"); });
     </script>
 
@@ -82,7 +76,7 @@
         const BASE_URL = 'https://brasilguard-final.onrender.com';
         window.clienteAtualOS = "";
 
-        // FUNÇÃO DE MUDAR ABAS (Sempre no topo para funcionar!)
+        // NAVEGAÇÃO (DEFINIDA NO TOPO PARA NÃO TRAVAR)
         function mudarAba(id, btn) {
             document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.btn-aba').forEach(b => b.classList.remove('ativa'));
@@ -104,7 +98,7 @@
             const serv = document.getElementById('os-servico').value;
             const btn = document.getElementById('btn-ia');
 
-            btn.innerText = "⏳ IA ESCREVENDO (3 PRO)...";
+            btn.innerText = "⏳ IA ESCREVENDO...";
             btn.disabled = true;
 
             try {
@@ -114,14 +108,14 @@
                     body: JSON.stringify({ cliente: window.clienteAtualOS, problema: prob, servico: serv })
                 });
 
-                const dados = await res.json(); // Variável criada APÓS a resposta
+                const dados = await res.json(); // A VARIÁVEL DADOS É CRIADA AQUI
 
                 if(dados.sucesso) {
                     window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
                     fecharModal();
-                } else { alert("IA Falhou: " + dados.erro); }
+                } else { alert("IA Falhou no Render."); }
             } catch (e) { alert("Erro de conexão com o Render."); }
-            finally { btn.innerText = "✨ Gerar Relatório IA"; btn.disabled = false; }
+            finally { btn.innerText = "✨ Gerar Relatório IA (Gemini 3)"; btn.disabled = false; }
         }
 
         function salvarOS() { alert("Salvo!"); fecharModal(); }
