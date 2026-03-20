@@ -166,28 +166,39 @@
 
         // --- MÁGICA DA IA CORRIGIDA ---
         window.gerarRelatorioIA = async function(event) {
-            if(event) event.preventDefault();
+    if(event) event.preventDefault();
 
-            const prob = document.getElementById('os-problema').value;
-            const serv = document.getElementById('os-servico').value;
+    const prob = document.getElementById('os-problema').value;
+    const serv = document.getElementById('os-servico').value;
+    const cliente = window.clienteAtualOS || "Cliente Brasilguard";
 
-            if(!prob || !serv) return alert("Preencha o problema e a solução!");
+    const btn = event.target;
+    const textoOriginal = btn.innerText;
+    btn.innerText = "⏳ IA PROCESSANDO (2.5 PRO)...";
+    btn.disabled = true;
 
-            const btn = document.getElementById('btn-gerar-ia');
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ AGENTE HUNTER ESCREVENDO...";
-            btn.disabled = true;
+    try {
+        const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente, problema: prob, servico: serv })
+        });
 
-            try {
-                const res = await fetch(`${BASE_URL}/api/hunter/gerar-os`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        cliente: window.clienteAtualOS, 
-                        problema: prob, 
-                        servico: serv 
-                    })
-                });
+        const dados = await res.json();
+
+        if(dados.sucesso) {
+            window.open(`https://wa.me/?text=${encodeURIComponent(dados.relatorio)}`, '_blank');
+            window.fecharModal();
+        } else {
+            alert("Erro: " + dados.erro);
+        }
+    } catch(e) {
+        alert("Erro na conexão com a Nave-Mãe.");
+    } finally {
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
+    }
+};
 
                 const dados = await res.json(); // AQUI A VARIÁVEL 'DADOS' NASCE
 
