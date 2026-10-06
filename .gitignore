@@ -1,2 +1,6 @@
 node_modules
 firebase-key.json
+*.env
+.env
+.env.*
+!.env.example
