@@ -1,0 +1,39 @@
+name: BRafaelS Gemini proxy unauthorized HTTP integration
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  http-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Start local server using dummy environment (no paid API calls)
+        env:
+          PORT: '18881'
+          BGD_INTERNAL_API_KEY: dummy-ci-not-production
+        run: |
+          node server.js > /tmp/bg-core.log 2>&1 &
+          echo $! >/tmp/bg-core.pid
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:18881/ >/dev/null && break; sleep 1; done
+          curl -fsS http://127.0.0.1:18881/ >/dev/null
+      - name: Unauthorized request must reject
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError
+          import json
+          url='http://127.0.0.1:18881/api/hunter/gerar-os'
+          for headers in [{'Content-Type':'application/json'}, {'Content-Type':'application/json','x-bgd-internal-key':'wrong'}]:
+            req=Request(url,data=json.dumps({'cliente':'test','problema':'test','servico':'test'}).encode(),headers=headers,method='POST')
+            try:
+              urlopen(req, timeout=8)
+              raise SystemExit('UNAUTHORIZED_CALL_ACCEPTED')
+            except HTTPError as e:
+              assert e.code==401,e.code
+              print('UNAUTHORIZED_HTTP_DENIED_401')
+          PY
