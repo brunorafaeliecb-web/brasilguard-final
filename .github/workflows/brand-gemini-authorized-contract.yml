@@ -1,0 +1,36 @@
+name: BRafaelS Gemini proxy authorized-path contract
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  authorized-path:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Start local API with dummy access key, no Gemini credential
+        env:
+          PORT: '18882'
+          BGD_INTERNAL_API_KEY: dummy-ci-not-production
+        run: |
+          node server.js >/tmp/brs-http.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:18882/ >/dev/null && break; sleep 1; done
+          curl -fsS http://127.0.0.1:18882/ >/dev/null
+      - name: Correct credential must reach handler (missing Gemini key is expected)
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError
+          import json
+          request=Request('http://127.0.0.1:18882/api/hunter/gerar-os',data=json.dumps({'cliente':'synthetic','problema':'synthetic','servico':'synthetic'}).encode(),headers={'Content-Type':'application/json','x-bgd-internal-key':'dummy-ci-not-production'},method='POST')
+          try: urlopen(request,timeout=8);raise SystemExit('UNEXPECTED_EXTERNAL_API_SUCCESS')
+          except HTTPError as err:
+            content=json.loads(err.read())
+            assert err.code==500,(err.code,content)
+            assert content.get('erro')=='API Key ausente.',content
+            print('AUTHORIZED_REQUEST_REACHED_HANDLER_NO_EXTERNAL_CALL')
+          PY
