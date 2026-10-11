@@ -1,0 +1,28 @@
+name: BRafaelS Gemini proxy authorization gate
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  proxy-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check backend JavaScript syntax
+        run: node --check server.js
+      - name: Verify deny-by-default and evidence rule
+        run: |
+          node <<'JS'
+          const fs=require('fs');
+          const s=fs.readFileSync('server.js','utf8');
+          for(const needle of [
+            "process.env.BGD_INTERNAL_API_KEY",
+            "req.headers['x-bgd-internal-key'] !== expectedKey",
+            "return res.status(401)",
+            "sem evidências técnicas verificáveis"
+          ])if(!s.includes(needle))throw Error('Missing control: '+needle);
+          if(s.includes('Confirme que o sistema está 100% operacional e testado.'))throw Error('Unverified certification prompt');
+          console.log('AUTH_GUARD_STATIC_PASS');
+          JS
